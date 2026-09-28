@@ -1,9 +1,11 @@
 
 # Playwright
 node_modules/
-/artifacts/results/
-/artifacts/reports/
-/generated/bdd-specs/
+/test-results/
+/playwright-report/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# playwright-bdd output - regenerated from the .feature files on every run
+/generated/

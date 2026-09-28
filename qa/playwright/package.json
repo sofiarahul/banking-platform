@@ -1,11 +1,11 @@
 {
   "name": "playwright",
   "version": "1.0.0",
-  "description": "This folder is reserved for the new Playwright automation set.",
+  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "playwright test -c config/playwright.config.ts",
-    "test:headed": "playwright test -c config/playwright.config.ts --headed"
+    "bddgen": "bddgen",
+    "test": "bddgen && playwright test"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +13,12 @@
   "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.62.1",
-    "@types/node": "^26.3.0",
+    "@types/node": "^26.4.0",
+    "@types/pg": "^8.23.1",
+    "pg": "^8.23.0",
     "playwright-bdd": "^9.2.0"
+  },
+  "dependencies": {
+    "zod": "^4.5.4"
   }
 }

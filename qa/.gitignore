@@ -7,7 +7,7 @@ playwright/test-results/
 playwright/blob-report/
 playwright/.playwright/
 artifacts/
-playwright-new/generated/bdd-specs/
+playwright/generated/bdd-specs/
 
 # Requested directories for Playwright work
 playwright/reports/

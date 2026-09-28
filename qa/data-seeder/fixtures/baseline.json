@@ -1,0 +1,29 @@
+{
+  "name": "baseline",
+  "description": "17 transactions in August 2026 with round, known totals - see README for the figures tests can assert.",
+  "transactions": [
+    {"date": "2026-08-01", "time": "09:00:00", "amount": "4000.00", "direction": "CREDIT", "status": "SUCCESS", "category": "Income", "description": "Payroll deposit"},
+    {"date": "2026-08-15", "time": "09:00:00", "amount": "1500.00", "direction": "CREDIT", "status": "SUCCESS", "category": "Income", "description": "Client invoice settled"},
+
+    {"date": "2026-08-01", "time": "10:00:00", "amount": "1650.00", "direction": "DEBIT", "status": "SUCCESS", "category": "Housing", "description": "Rent payment"},
+    {"date": "2026-08-02", "time": "10:00:00", "amount": "350.00", "direction": "DEBIT", "status": "SUCCESS", "category": "Housing", "description": "Condo maintenance fee"},
+
+    {"date": "2026-08-03", "time": "11:00:00", "amount": "200.00", "direction": "DEBIT", "status": "SUCCESS", "category": "Food & Drink", "description": "Grocery shop - Loblaws"},
+    {"date": "2026-08-10", "time": "11:00:00", "amount": "150.00", "direction": "DEBIT", "status": "SUCCESS", "category": "Food & Drink", "description": "Restaurant - The Keg"},
+    {"date": "2026-08-17", "time": "11:00:00", "amount": "100.00", "direction": "DEBIT", "status": "SUCCESS", "category": "Food & Drink", "description": "Grocery shop - Metro"},
+
+    {"date": "2026-08-04", "time": "12:00:00", "amount": "156.00", "direction": "DEBIT", "status": "SUCCESS", "category": "Transport", "description": "Monthly transit pass"},
+    {"date": "2026-08-19", "time": "12:00:00", "amount": "44.00", "direction": "DEBIT", "status": "SUCCESS", "category": "Transport", "description": "Rideshare - Uber"},
+
+    {"date": "2026-08-05", "time": "13:00:00", "amount": "120.00", "direction": "DEBIT", "status": "SUCCESS", "category": "Utilities", "description": "Hydro bill"},
+    {"date": "2026-08-20", "time": "13:00:00", "amount": "80.00", "direction": "DEBIT", "status": "SUCCESS", "category": "Utilities", "description": "Internet - Rogers"},
+
+    {"date": "2026-08-08", "time": "14:00:00", "amount": "300.00", "direction": "DEBIT", "status": "SUCCESS", "category": "Shopping", "description": "Online order - Amazon"},
+    {"date": "2026-08-12", "time": "15:00:00", "amount": "100.00", "direction": "DEBIT", "status": "SUCCESS", "category": "Entertainment", "description": "Cinema tickets"},
+    {"date": "2026-08-22", "time": "16:00:00", "amount": "50.00", "direction": "DEBIT", "status": "SUCCESS", "category": "Health", "description": "Pharmacy - prescription refill"},
+
+    {"date": "2026-08-25", "time": "17:00:00", "amount": "999.00", "direction": "DEBIT", "status": "FAILED", "category": "Shopping", "description": "Electronics - Best Buy"},
+    {"date": "2026-08-26", "time": "17:00:00", "amount": "75.00", "direction": "DEBIT", "status": "FAILED", "category": "Transport", "description": "Fuel - Petro-Canada"},
+    {"date": "2026-08-28", "time": "18:00:00", "amount": "60.00", "direction": "DEBIT", "status": "PENDING", "category": "Food & Drink", "description": "Coffee - Tim Hortons"}
+  ]
+}
