@@ -5,11 +5,8 @@ tools we use to look at the data behind the UI.
 
 Read this first, then the framework-specific READMEs:
 
-- [`qa/README.md`](README.md) — the QA workspace index and branch policy
-- [`qa/selenium/README.md`](selenium/README.md) — the Selenium/Cucumber suite conventions
-- [`qa/data-seeder/README.md`](data-seeder/README.md) — bulk transaction seeding (see the caveat below)
-- [`SETUP.md`](../SETUP.md) — the developers' full-stack setup guide
-
+- [`README.md`](README.md) — the QA workspace index and branch policy
+- [`data-seeder/README.md`](data-seeder/README.md) — bulk transaction seeding (see the caveat below)
 ---
 
 ## 1. What you are testing
@@ -85,7 +82,17 @@ database if it is missing, then exits. Seeing it as **Exited (0)** in
 This is the stack everyone on the project runs. The QA database viewer is a
 second, separate Compose file — see section 5.
 
-### Start the backend
+### Quickstart
+
+Ensure that ```.local/run_app.env``` is pointing to the app_root
+
+```bash
+  sh .local/run_app.sh
+```
+
+#### Manual start
+
+**Start the backend**
 
 ```bash
 cd backend
@@ -96,7 +103,7 @@ The seed flag gives you the shared personas (section 4). Without it you start
 with an empty database. `SEED_PERSONAS_ENABLED=true` in the environment does the
 same thing and is how QA and CI environments should set it.
 
-### Start the frontend
+**Start the frontend**
 
 From the repo root, in its own terminal:
 

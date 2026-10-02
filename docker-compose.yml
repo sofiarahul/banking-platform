@@ -2,7 +2,7 @@
 # everyone needs pgvector, only QA needs a database viewer, so this file is
 # brought up on its own and never touches the shared services.
 #
-#   docker compose -f qa/docker-compose.yml up -d     (from the repo root)
+#   docker compose -f docker-compose.yml up -d     (from the repo root)
 #   cd qa && docker compose up -d                     (equivalent)
 #
 # It runs as its own Compose project, so `docker compose down` at the repo root

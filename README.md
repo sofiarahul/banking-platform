@@ -11,18 +11,14 @@ This folder contains QA-only assets and test automation framework.
 - Pull dev updates from `origin/feature/springai` into `QA`.
 
 ## Layout
-- `selenium/` - Existing Selenium + Cucumber + Maven suite.
-- `playwright/` - New Playwright suite (in progress).
-- `.githooks/` - Local git safeguards for QA-only commits/pushes.
-- `.github/` - QA-specific Copilot guidance.
+- `playwright/` - Playwright suite (in progress).
 - `docker-compose.yml` - QA-only containers (Adminer DB viewer), separate from the root stack.
-- `sync-from-feature.ps1` - Sync helper from dev branch into QA.
 
 ## Common commands
-Sync QA with latest dev branch:
 
-```powershell
-./sync-from-feature.ps1
+Start app:
+```
+sh .local/run_app.sh
 ```
 
 Run Playwright Tests suite:

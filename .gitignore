@@ -22,3 +22,4 @@ playwright/**/*.trace
 # Local env/config
 playwright/.env
 playwright/.env.*
+.local/run_app.env
