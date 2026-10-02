@@ -6,7 +6,7 @@ Feature: As a customer, I want to set a savings goal on an account so that I can
         And the user is logged in to the application
         And the user is on the savings goals section
 
-    @CreatesData
+    @CreatesData @smoke @regression @critical
     Scenario: User should be able to create a savings goal with valid details
         When the user starts a savings goal on an account without one
         And User enters goal name "Emergency Fund" target amount "5000.00" and target date in "90" days
@@ -14,13 +14,13 @@ Feature: As a customer, I want to set a savings goal on an account so that I can
         Then the savings goal "Emergency Fund" should be created
         And the goal card for "Emergency Fund" should show a target of "$5000.00"
 
-    @CreatesData
+    @CreatesData @regression
     Scenario: The review screen shows the details entered before the goal is created
         When the user starts a savings goal on an account without one
         And User enters goal name "Travel" target amount "1200.50" and target date in "30" days
         Then the review screen should show goal "Travel" and target amount "$1200.50"
 
-    @CreatesData
+    @CreatesData @regression @status
     Scenario: A goal already covered by the account balance is shown as achieved
         Given the account the goal is created on is the funded account
         When the user starts a savings goal on an account without one
@@ -29,7 +29,7 @@ Feature: As a customer, I want to set a savings goal on an account so that I can
         Then the goal card for "Tuition" should show the status "Achieved"
         And the goal card for "Tuition" should show progress of "100"
 
-    @CreatesData
+    @CreatesData @regression @status
     Scenario: A goal on an account with no money is shown as not started
         Given the account the goal is created on is the empty account
         When the user starts a savings goal on an account without one
@@ -37,13 +37,13 @@ Feature: As a customer, I want to set a savings goal on an account so that I can
         And User submits the goal from the review screen
         Then the goal card for "Car" should show the status "Not Started"
 
-    @CreatesData
+    @CreatesData @regression @business-rule
     Scenario: An account can only hold one active savings goal
         Given a savings goal "Home" of "15000.00" exists on the empty account
         When the user views the savings goals section
         Then the empty account should offer no way to add a second goal
 
-    @CreatesData
+    @CreatesData @regression @edit
     Scenario: User should be able to edit an existing savings goal
         Given a savings goal "Retirement" of "9000.00" exists on the empty account
         When the user edits the savings goal "Retirement"
@@ -52,7 +52,7 @@ Feature: As a customer, I want to set a savings goal on an account so that I can
         Then the savings goal should be updated
         And the goal card for "Retirement" should show a target of "$12000.00"
 
-    @CreatesData
+    @CreatesData @regression @delete
     Scenario: User should be able to delete a savings goal
         Given a savings goal "Other" of "800.00" exists on the empty account
         When the user deletes the savings goal "Other"
@@ -60,6 +60,7 @@ Feature: As a customer, I want to set a savings goal on an account so that I can
         Then the savings goal should be deleted
         And no goal card for "Other" should be displayed
 
+    @regression @negative @validation
     Scenario Outline: User should not be able to create a savings goal with invalid details
         When the user starts a savings goal on an account without one
         And User enters goal name "<goalName>" target amount "<targetAmount>" and target date in "<days>" days

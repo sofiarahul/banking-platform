@@ -4,7 +4,7 @@ Feature: As a new user, I want to register an account so that I can access the p
         Given the user is on the 'registration' page
         And registration account type step is displayed
 
-    @CreatesData
+    @CreatesData @smoke @regression @critical
     Scenario: User should be able to register a personal account with valid details
         When the user selects 'personal' account and clicks continue
         And User enters registration email "uniqueEmail" password "Testing123!" name "Test User" address "100 Auto Main Street" and date of birth "1990-01-01"
@@ -17,13 +17,14 @@ Feature: As a new user, I want to register an account so that I can access the p
     # login row has already been written - leaving an orphan user with no customer profile.
     # Drop @fail once the payload or the DTO is fixed; Playwright then reports this as
     # "expected to fail, but passed".
-    @CreatesData @fail
+    @CreatesData @fail @regression
     Scenario: User should be able to register a business account with valid details
         When the user selects 'business' account and clicks continue
         And User enters registration email "uniqueEmail" password "Testing123!" name "Test Company" address "100 Auto Main Street" and business number "123456789"
         And User submits the registration form
         Then User should successfully complete registration
 
+    @regression @negative
     Scenario: User should not be able to register with an already registered email
         And the default testing account exists
         When the user selects 'personal' account and clicks continue
@@ -31,6 +32,7 @@ Feature: As a new user, I want to register an account so that I can access the p
         And User submits the registration form
         Then User should see a duplicate email registration error
 
+    @regression @negative @validation
     Scenario Outline: User should not be able to register a personal account when registration details are invalid
         When the user selects 'personal' account and clicks continue
         And User enters registration email "<email>" password "<password>" name "<name>" address "<address>" and date of birth "<dob>"
@@ -46,6 +48,7 @@ Feature: As a new user, I want to register an account so that I can access the p
             | uniqueEmail | Testing123! | Test User | 100 Auto Main Street |            | Date of birth is required.                         |
             | uniqueEmail | Testing123! | Test User | 100 Auto Main Street | 2015-01-01 | You must be 18 years or above to open an account.  |
 
+    @regression @negative @validation @browser-validation
     Scenario Outline: The browser blocks a malformed email before the form is submitted
         When the user selects 'personal' account and clicks continue
         And User enters registration email "<email>" password "Testing123!" name "Test User" address "100 Auto Main Street" and date of birth "1990-01-01"
@@ -57,6 +60,7 @@ Feature: As a new user, I want to register an account so that I can access the p
             | not-an-email |
             | missing-at   |
 
+    @regression @negative @validation @browser-validation
     Scenario Outline: User should not be able to register a business account when business number is invalid
         When the user selects 'business' account and clicks continue
         And User enters registration email "uniqueEmail" password "Testing123!" name "Test Company" address "100 Auto Main Street" and business number "<businessNumber>"
