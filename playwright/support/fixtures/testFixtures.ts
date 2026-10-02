@@ -1,9 +1,11 @@
+import fs from 'fs/promises';
 import { test as base, createBdd } from 'playwright-bdd';
 
 import {LoginPage} from '../../src/pages/auth/LoginPage';
 import {RegistrationPage} from '../../src/pages/auth/RegistrationPage';
 import {SavingsGoalsPage} from '../../src/pages/accounts/SavingsGoalsPage';
 import {AccountAPI, SeededAccounts} from '../../src/api/account';
+import {beginRequestCapture, clearRequestCapture, recordRequest, snapshotRequestLogs} from '../../src/api/requestLogger';
 import {GLOBAL_DATA} from '../../global_data/globalData';
 import {deleteCustomerCascade, deleteUserByUsername} from '../../src/db/testDb';
 
@@ -59,7 +61,45 @@ type BankingCustomer = {
     current: () => SeededCustomer;
 };
 
+const wrapRequestLogging = (request: any) => {
+    const methods = ['get', 'post', 'put', 'delete', 'patch'] as const;
+
+    for (const method of methods) {
+        const original = request[method].bind(request);
+        request[method] = async (...args: any[]) => {
+            const [url, options] = args;
+            recordRequest({
+                method: method.toUpperCase(),
+                url: String(url),
+                body: options?.data ?? options?.json ?? options?.form ?? options?.body,
+                headers: options?.headers,
+            });
+            return original(...args);
+        };
+    }
+};
+
 export const test = base.extend<{pages: AppPages, testUsers: TestUsers, bankingCustomer: BankingCustomer}>({
+    request: async ({ request }, use, testInfo) => {
+        beginRequestCapture(testInfo.testId);
+        wrapRequestLogging(request);
+
+        try {
+            await use(request);
+        } finally {
+            if (testInfo.status === 'failed') {
+                const reportFile = testInfo.outputPath('api-request-trace.txt');
+                const requestTrace = snapshotRequestLogs(testInfo.testId);
+                await fs.writeFile(reportFile, requestTrace, 'utf8');
+                await testInfo.attach('api request trace', {
+                    path: reportFile,
+                    contentType: 'text/plain',
+                });
+            }
+            clearRequestCapture(testInfo.testId);
+        }
+    },
+
     pages: async ({ page }, use) => {
         await use({
             loginPage: new LoginPage(page),
