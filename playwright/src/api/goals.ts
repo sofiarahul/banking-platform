@@ -1,5 +1,6 @@
 import {APIRequestContext} from '@playwright/test';
 import {z} from 'zod';
+import {SavingsGoalRequest, SavingsGoalRequestData} from './models';
 
 const goalSchema = z.object({
     goal_id: z.number(),
@@ -35,10 +36,10 @@ export class GoalsAPI {
         return { Authorization: `Bearer ${this.accessToken}` };
     }
 
-    async createGoalAPI(accountId: number, data: {goalName: string, targetAmount: number, targetDate: string}) {
+    async createGoalAPI(accountId: number, data: SavingsGoalRequestData | SavingsGoalRequest) {
         return this.request.post(`/api/goals/accounts/${accountId}`, {
             headers: this.authHeaders,
-            data
+            data: data instanceof SavingsGoalRequest ? data.toJSON() : data
         });
     }
 
@@ -55,10 +56,11 @@ export class GoalsAPI {
     }
 
     /** Creates a goal and returns it, failing loudly rather than leaving a scenario to guess. */
-    async createGoal(accountId: number, data: {goalName: string, targetAmount: number, targetDate: string}): Promise<SavingsGoal> {
+    async createGoal(accountId: number, data: SavingsGoalRequestData | SavingsGoalRequest): Promise<SavingsGoal> {
+        const payload = data instanceof SavingsGoalRequest ? data.toJSON() : data;
         const response = await this.createGoalAPI(accountId, data);
         if (!response.ok()) {
-            throw new Error(`Could not create goal "${data.goalName}" on account ${accountId}: ${response.status()} ${await response.text()}`);
+            throw new Error(`Could not create goal "${payload.goalName}" on account ${accountId}: ${response.status()} ${await response.text()}`);
         }
         return goalSchema.parse(await response.json());
     }

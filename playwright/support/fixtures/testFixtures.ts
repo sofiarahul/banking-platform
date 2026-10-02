@@ -5,6 +5,7 @@ import {LoginPage} from '../../src/pages/auth/LoginPage';
 import {RegistrationPage} from '../../src/pages/auth/RegistrationPage';
 import {SavingsGoalsPage} from '../../src/pages/accounts/SavingsGoalsPage';
 import {AccountAPI, SeededAccounts} from '../../src/api/account';
+import { RegistrationRequest } from '../../src/api/models';
 import {beginRequestCapture, clearRequestCapture, recordRequest, snapshotRequestLogs} from '../../src/api/requestLogger';
 import {GLOBAL_DATA} from '../../global_data/globalData';
 import {deleteCustomerCascade, deleteUserByUsername} from '../../src/db/testDb';
@@ -171,19 +172,20 @@ export const test = base.extend<{pages: AppPages, testUsers: TestUsers, bankingC
 
         await use({
             create: async () => {
-                const credentials = {
-                    username: testUsers.unique('qa-goals'),
-                    password: GLOBAL_DATA.test_user_password
-                };
+                const credentials = RegistrationRequest.builder()
+                    .withUsername(testUsers.unique('qa-goals'))
+                    .withPassword(GLOBAL_DATA.test_user_password)
+                    .build();
+                const credentialsData = credentials.toJSON();
                 const api = new AccountAPI(request);
-                const { accessToken, customerId } = await api.registerAndCreateCustomer(credentials);
+                const { accessToken, customerId } = await api.registerAndCreateCustomer(credentialsData);
 
                 // Recorded before the accounts are opened: if opening one fails, the
                 // customer that already exists still has to be torn down.
                 state.customerId = customerId;
 
                 state.seeded = {
-                    ...credentials,
+                    ...credentialsData,
                     accessToken,
                     customerId,
                     fundedAccountId: await api.openCheckingAccount(accessToken, customerId, '50000.00'),

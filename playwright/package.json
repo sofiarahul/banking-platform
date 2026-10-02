@@ -13,10 +13,12 @@
   "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.62.1",
+    "@types/mime-types": "^3.0.1",
     "@types/node": "^26.4.0",
     "@types/pg": "^8.23.1",
     "pg": "^8.23.0",
-    "playwright-bdd": "^9.2.0"
+    "playwright-bdd": "^9.2.0",
+    "typescript": "^7.0.2"
   },
   "dependencies": {
     "zod": "^4.5.4"

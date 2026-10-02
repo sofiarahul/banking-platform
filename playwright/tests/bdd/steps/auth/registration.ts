@@ -2,6 +2,7 @@ import { expect } from '@playwright/test';
 import { Given, When, Then } from '../../../../support/fixtures/testFixtures';
 import { GLOBAL_DATA } from '../../../../global_data/globalData';
 import { AccountAPI } from '../../../../src/api/account';
+import { RegistrationRequest } from '../../../../src/api/models';
 
 // await pages.screenshot({ path: 'playwright-report/screenshots/register-business.png' });
 
@@ -16,10 +17,12 @@ Given('the default testing account exists', async ({ request }) => {
 
     // 201 on the first run, 409 USER_ALREADY_EXISTS afterwards. Both mean the
     // account is there, which is all this step promises - so neither is an error.
-    const response = await accountAPI.registerAccountAPI({
-        username: GLOBAL_DATA.test_user_username,
-        password: GLOBAL_DATA.test_user_password
-    });
+    const response = await accountAPI.registerAccountAPI(
+        RegistrationRequest.builder()
+            .withUsername(GLOBAL_DATA.test_user_username)
+            .withPassword(GLOBAL_DATA.test_user_password)
+            .build()
+    );
 
     expect(
         [201, 409],

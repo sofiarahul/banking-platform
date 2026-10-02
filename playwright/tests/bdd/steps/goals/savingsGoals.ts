@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test';
 import { Given, When, Then } from '../../../../support/fixtures/testFixtures';
 import { GoalsAPI } from '../../../../src/api/goals';
+import { SavingsGoalRequest } from '../../../../src/api/models';
 
 // Local date, not toISOString(): that gives the UTC date, which runs a day ahead
 // in the evening west of UTC and turns "-1 days" into today in the browser's eyes.
@@ -35,11 +36,14 @@ Given('the account the goal is created on is the {word} account', async ({ page,
     const seeded = bankingCustomer.current();
     const otherAccountId = which === 'funded' ? seeded.emptyAccountId : seeded.fundedAccountId;
 
-    await new GoalsAPI(request, seeded.accessToken).createGoal(otherAccountId, {
-        goalName: 'Parked Goal',
-        targetAmount: 1,
-        targetDate: dateInDays(365)
-    });
+    await new GoalsAPI(request, seeded.accessToken).createGoal(
+        otherAccountId,
+        SavingsGoalRequest.builder()
+            .withGoalName('Parked Goal')
+            .withTargetAmount(1)
+            .withTargetDate(dateInDays(365))
+            .build()
+    );
 
     await page.reload();
     await expect(pages.savingsGoalsPage.addGoalButtons).toHaveCount(1);
@@ -48,11 +52,14 @@ Given('the account the goal is created on is the {word} account', async ({ page,
 Given('a savings goal {string} of {string} exists on the empty account', async ({ page, pages, request, bankingCustomer }, goalName: string, targetAmount: string) => {
     const seeded = bankingCustomer.current();
 
-    await new GoalsAPI(request, seeded.accessToken).createGoal(seeded.emptyAccountId, {
-        goalName,
-        targetAmount: Number(targetAmount),
-        targetDate: dateInDays(180)
-    });
+    await new GoalsAPI(request, seeded.accessToken).createGoal(
+        seeded.emptyAccountId,
+        SavingsGoalRequest.builder()
+            .withGoalName(goalName)
+            .withTargetAmount(Number(targetAmount))
+            .withTargetDate(dateInDays(180))
+            .build()
+    );
 
     await page.reload();
     await expect(pages.savingsGoalsPage.goalCardNamed(goalName)).toBeVisible();

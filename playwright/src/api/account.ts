@@ -1,5 +1,13 @@
 import {APIRequestContext} from '@playwright/test';
 import {z} from 'zod';
+import {
+    AccountOpeningRequest,
+    AccountOpeningRequestData,
+    CustomerProfile,
+    CustomerProfileData,
+    RegistrationRequest,
+    RegistrationRequestData,
+} from './models';
 
 const authResponseSchema = z.object({
     accessToken: z.string().min(1),
@@ -48,16 +56,16 @@ export class AccountAPI {
         this.request = request;
     }
 
-    async registerAccountAPI(data: {username: string, password: string}) {
-        return this.request.post('/api/auth/register', { data });
+    async registerAccountAPI(data: RegistrationRequestData | RegistrationRequest) {
+        return this.request.post('/api/auth/register', { data: data instanceof RegistrationRequest ? data.toJSON() : data });
     }
 
-    async loginAccountAPI(data: {username: string, password: string}) {
-        return this.request.post('/api/auth/login', { data });
+    async loginAccountAPI(data: RegistrationRequestData | RegistrationRequest) {
+        return this.request.post('/api/auth/login', { data: data instanceof RegistrationRequest ? data.toJSON() : data });
     }
 
     /** Signs in and returns the bearer token every other call below needs. */
-    async getAccessToken(data: {username: string, password: string}): Promise<string> {
+    async getAccessToken(data: RegistrationRequestData | RegistrationRequest): Promise<string> {
         const response = await this.loginAccountAPI(data);
         if (!response.ok()) {
             throw new Error(`Login failed for ${data.username}: ${response.status()} ${await response.text()}`);
@@ -65,17 +73,18 @@ export class AccountAPI {
         return authResponseSchema.parse(await response.json()).accessToken;
     }
 
-    async createCustomerAPI(accessToken: string, data: {name: string, address: string, dateOfBirth: string}) {
+    async createCustomerAPI(accessToken: string, data: CustomerProfileData | CustomerProfile) {
+        const payload = data instanceof CustomerProfile ? data.toJSON() : data;
         return this.request.post('/api/customers', {
             headers: { Authorization: `Bearer ${accessToken}` },
-            data: { ...data, type: 'PERSON', kycVerified: true }
+            data: { ...payload, type: payload.type ?? 'PERSON', kycVerified: payload.kycVerified ?? true }
         });
     }
 
-    async createAccountAPI(accessToken: string, customerId: number, data: {accountType: string, balance: string}) {
+    async createAccountAPI(accessToken: string, customerId: number, data: AccountOpeningRequestData | AccountOpeningRequest) {
         return this.request.post(`/customers/${customerId}/accounts`, {
             headers: { Authorization: `Bearer ${accessToken}` },
-            data
+            data: data instanceof AccountOpeningRequest ? data.toJSON() : data
         });
     }
 
@@ -102,11 +111,15 @@ export class AccountAPI {
 
         const accessToken = await this.getAccessToken(credentials);
 
-        const customer = await this.createCustomerAPI(accessToken, {
-            name: 'Goals Test Customer',
-            address: '100 Auto Main Street',
-            dateOfBirth: '1990-01-01'
-        });
+        const customer = await this.createCustomerAPI(accessToken,
+            CustomerProfile.builder()
+                .withName('Goals Test Customer')
+                .withAddress('100 Auto Main Street')
+                .withDateOfBirth('1990-01-01')
+                .withType('PERSON')
+                .withKycVerified(true)
+                .build()
+        );
         if (!customer.ok()) {
             throw new Error(`Could not create a customer: ${customer.status()} ${await customer.text()}`);
         }
@@ -121,10 +134,12 @@ export class AccountAPI {
      * arrangement free of the TFSA/RRSP eligibility rules in AccountService.
      */
     async openCheckingAccount(accessToken: string, customerId: number, balance: string): Promise<number> {
-        const response = await this.createAccountAPI(accessToken, customerId, {
-            accountType: 'CHECKING',
-            balance
-        });
+        const response = await this.createAccountAPI(accessToken, customerId,
+            AccountOpeningRequest.builder()
+                .withAccountType('CHECKING')
+                .withBalance(balance)
+                .build()
+        );
         if (!response.ok()) {
             throw new Error(`Could not open an account for customer ${customerId}: ${response.status()} ${await response.text()}`);
         }
