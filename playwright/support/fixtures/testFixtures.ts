@@ -126,10 +126,10 @@ export const test = base.extend<{pages: AppPages, testUsers: TestUsers, bankingC
             return normalised;
         };
 
-        // Timestamp plus a random suffix: fullyParallel is on, so two workers can
-        // reach this within the same millisecond.
+        // crypto.randomUUID() provides better uniqueness than timestamp + random
+        // especially under fullyParallel where workers can hit the same millisecond.
         const unique = (prefix = 'qa-reg') =>
-            track(`${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`);
+            track(`${prefix}-${crypto.randomUUID()}@example.com`);
 
         await use({
             unique,
