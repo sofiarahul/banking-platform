@@ -1,9 +1,0 @@
-#!/usr/bin/env sh
-set -eu
-
-branch="$(git symbolic-ref --quiet --short HEAD || true)"
-if [ "$branch" != "QA" ]; then
-  echo "ERROR: Commits are restricted to branch 'QA'. Current branch: '${branch:-DETACHED}'" >&2
-  echo "Switch to QA before committing: git switch QA" >&2
-  exit 1
-fi

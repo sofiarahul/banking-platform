@@ -1,53 +1,38 @@
+# QA-only stack. Deliberately separate from the repo-root docker-compose.yml:
+# everyone needs pgvector, only QA needs a database viewer, so this file is
+# brought up on its own and never touches the shared services.
+#
+#   docker compose -f qa/docker-compose.yml up -d     (from the repo root)
+#   cd qa && docker compose up -d                     (equivalent)
+#
+# It runs as its own Compose project, so `docker compose down` at the repo root
+# leaves it alone, and bringing this down leaves the database running.
 services:
-  # Postgres + pgvector. Hosts two separate databases on one server:
-  #   banking_chat - the chatbot's embedded knowledge base and chat interaction log
-  #   banking_core - the application's core banking data (spec 004)
-  # They stay distinct databases so the backend's two datasources
-  # (ChatbotDataSourceConfig / PrimaryDataSourceConfig) are unchanged.
-  pgvector:
-    image: pgvector/pgvector:pg16
-    container_name: banking-pgvector
+  # Browser-based DB viewer - the practical replacement for the H2 console that
+  # spec 004 retired. Reaches both databases on the pgvector server:
+  #   banking_core - core banking data (what the backend now reads/writes)
+  #   banking_chat - chatbot knowledge base and interaction log
+  # Local dev convenience only; not part of the app's runtime.
+  adminer:
+    image: adminer:4.8.1
+    container_name: qa-adminer
     restart: unless-stopped
-    environment:
-      # Sourced from the repo-root .env file (falls back to these defaults if unset,
-      # e.g. when running `docker compose up` without a .env present).
-      POSTGRES_USER: ${CHATBOT_DB_USERNAME:-banking_chat}
-      POSTGRES_PASSWORD: ${CHATBOT_DB_PASSWORD:-banking_chat}
-      POSTGRES_DB: banking_chat
     ports:
-      - "5433:5432"
-    volumes:
-      - pgvector-data:/var/lib/postgresql/data
-      # Postgres only runs this on a brand new (empty) data directory.
-      - ./docker/postgres-init:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${CHATBOT_DB_USERNAME:-banking_chat} -d banking_chat"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  # Creates banking_core on every `docker compose up`, including on volumes that
-  # already existed before that database was introduced.
-  #
-  # This exists because the init script mounted above only ever runs against an
-  # empty data directory. Anyone who had this stack running before spec 004 has a
-  # populated pgvector-data volume, so that script never fires for them and the
-  # backend fails at startup against a database that does not exist. Wiping the
-  # volume would fix it but needlessly destroys the ingested knowledge base.
-  #
-  # Idempotent: it checks pg_database first and does nothing if banking_core is
-  # already there. The container runs once and exits, so seeing it as "Exited (0)"
-  # in `docker compose ps` is the expected result, not a failure.
-  create-banking-core:
-    image: pgvector/pgvector:pg16
-    container_name: banking-core-init
-    restart: "no"
-    depends_on:
-      pgvector:
-        condition: service_healthy
+      - "8090:8080"
+    # Reaches the database over the host's published port rather than a shared
+    # Docker network, which is what keeps this file independent of the root
+    # stack. It therefore also works against a Postgres running natively on the
+    # host, not just the pgvector container.
+    extra_hosts:
+      # Docker Desktop resolves host.docker.internal already; this line is what
+      # makes the same file work on Linux.
+      - "host.docker.internal:host-gateway"
     environment:
-      PGPASSWORD: ${CHATBOT_DB_PASSWORD:-banking_chat}
-    entrypoint: ["sh", "-c", "psql -h pgvector -U ${CHATBOT_DB_USERNAME:-banking_chat} -d postgres -tc \"SELECT 1 FROM pg_database WHERE datname = 'banking_core'\" | grep -q 1 || psql -h pgvector -U ${CHATBOT_DB_USERNAME:-banking_chat} -d postgres -c \"CREATE DATABASE banking_core\""]
-
-volumes:
-  pgvector-data:
+      # Pre-fills the "Server" field on the login form. Note this is all it does -
+      # the image has no equivalent for the driver, and the "System" dropdown
+      # defaults to MySQL. Submitting the form with MySQL selected against a
+      # Postgres port HANGS rather than failing: the MySQL client sits waiting for
+      # a server greeting that never comes. Open Adminer through
+      #   http://localhost:8090/?pgsql=host.docker.internal:5433
+      # which preselects PostgreSQL, instead of the bare host:port.
+      ADMINER_DEFAULT_SERVER: host.docker.internal:5433

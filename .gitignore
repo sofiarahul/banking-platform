@@ -1,47 +1,24 @@
-# Dependencies
-node_modules/
-frontend/node_modules/
+# QA root-level ignores for framework-specific outputs
 
-# Build outputs
-dist/
-frontend/dist/
+# Playwright dependencies and generated artifacts
+playwright/node_modules/
+playwright/playwright-report/
+playwright/test-results/
+playwright/blob-report/
+playwright/.playwright/
+artifacts/
+playwright/generated/bdd-specs/
 
-# Vite cache
-.vite/
-frontend/.vite/
-.env
-# Database files
-data/
-*.mv.db
-*.trace.db
+# Requested directories for Playwright work
+playwright/reports/
+playwright/target/
 
-# Logs
-logs/
-*.log
+# Common Playwright attachments
+playwright/**/*.png
+playwright/**/*.webm
+playwright/**/*.zip
+playwright/**/*.trace
 
-# Java build artifacts
-**/target/
-**/*.class
-**/.classpath
-**/.project
-**/.factorypath
-**/.settings/
-**/.DS_Store
-**/.mvn/wrapper/maven-wrapper.jar
-
-# IDE
-.claude/
-.idea/
-*.iml
-*.iws
-*.ipr
-
-# OS
-.DS_Store
-Thumbs.db
-
-group123-backend/
-spec_frontend.md
-vite.config.js
-.env
-backend/data/digitalbankdb.mv.db
+# Local env/config
+playwright/.env
+playwright/.env.*
